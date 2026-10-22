@@ -221,8 +221,9 @@ function Contact() {
 
   async function onSubmit(e) {
     e.preventDefault()
+    const form = e.currentTarget
     setStatus('sending')
-    const data = new FormData(e.currentTarget)
+    const data = new FormData(form)
     data.append('access_key', WEB3FORMS_KEY || '')
     data.append('subject', 'New message from hypertonic website')
     try {
@@ -230,7 +231,7 @@ function Contact() {
       const json = await res.json()
       if (json.success) {
         setStatus('sent')
-        e.currentTarget.reset()
+        form.reset()
       } else {
         setErrorMsg(json.message || '')
         setStatus('error')
