@@ -217,6 +217,7 @@ function Tools() {
 
 function Contact() {
   const [status, setStatus] = useState('idle')
+  const [errorMsg, setErrorMsg] = useState('')
 
   async function onSubmit(e) {
     e.preventDefault()
@@ -231,9 +232,11 @@ function Contact() {
         setStatus('sent')
         e.currentTarget.reset()
       } else {
+        setErrorMsg(json.message || '')
         setStatus('error')
       }
     } catch {
+      setErrorMsg('')
       setStatus('error')
     }
   }
@@ -262,7 +265,7 @@ function Contact() {
             {status === 'sending' ? 'Sending…' : 'Send message'}
           </button>
           {status === 'sent' && <p className="note ok">Thanks! We'll be in touch soon.</p>}
-          {status === 'error' && <p className="note err">Something went wrong. Please try again.</p>}
+          {status === 'error' && <p className="note err">Something went wrong. {errorMsg || 'Please try again.'}</p>}
         </form>
       </div>
     </section>
