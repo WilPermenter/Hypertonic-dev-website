@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import logo from './assets/logo.png'
 import longship from './assets/longship.jpg'
 import franticSearch from './assets/franticsearch.jpg'
@@ -13,6 +13,14 @@ const NAV = [
 ]
 
 const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY
+
+// Shown in the footer and privacy policy only when filled in.
+const BUSINESS = {
+  name: 'Hypertonic Studios LLC',
+  email: 'wilpermenter@gmail.com',
+  address: '',
+}
+const POLICY_DATE = 'October 22, 2026'
 
 function Header() {
   return (
@@ -273,20 +281,149 @@ function Contact() {
   )
 }
 
+function Footer() {
+  return (
+    <footer className="footer">
+      <div className="container footer-inner">
+        <div>
+          <div>© {new Date().getFullYear()} {BUSINESS.name}. All rights reserved.</div>
+          {BUSINESS.address && <div className="footer-sub">{BUSINESS.address}</div>}
+          {BUSINESS.email && (
+            <div className="footer-sub">
+              <a href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</a>
+            </div>
+          )}
+        </div>
+        <nav className="footer-links" aria-label="Footer">
+          <a href="#contact">Contact</a>
+          <a href="#privacy">Privacy Policy</a>
+        </nav>
+      </div>
+    </footer>
+  )
+}
+
+function Privacy() {
+  return (
+    <section className="section legal">
+      <div className="container narrow">
+        <p className="eyebrow">Legal</p>
+        <h1>Privacy Policy</h1>
+        <p className="muted-text">Last updated: {POLICY_DATE}</p>
+        <p>
+          This policy explains what information {BUSINESS.name} ("we", "us") collects through this
+          website and how we use it.
+        </p>
+
+        <h2>Information we collect</h2>
+        <p>
+          When you use the contact form, we collect the name, email address and message you
+          provide. We don't ask for anything else, and we don't require an account to use this
+          site.
+        </p>
+
+        <h2>How we use it</h2>
+        <p>
+          We use your information only to read and respond to your message. We don't sell your
+          information or use it for advertising.
+        </p>
+
+        <h2>Service providers</h2>
+        <ul>
+          <li>
+            <strong>Web3Forms</strong> processes contact form submissions and delivers them to us
+            by email.
+          </li>
+          <li>
+            <strong>DigitalOcean</strong> hosts this website and may keep standard server logs,
+            such as IP addresses and browser details.
+          </li>
+          <li>
+            <strong>Google Fonts</strong> serves the site's typeface, so your browser requests it
+            from Google, which receives your IP address.
+          </li>
+        </ul>
+
+        <h2>Cookies and analytics</h2>
+        <p>This site doesn't set cookies and doesn't use analytics or advertising trackers.</p>
+
+        <h2>How long we keep it</h2>
+        <p>
+          We keep messages for as long as needed to respond and to maintain a record of our
+          business communications, then delete them.
+        </p>
+
+        <h2>Your choices</h2>
+        <p>
+          You can ask us to access, correct or delete the information you've sent us by contacting
+          us using the details below.
+        </p>
+
+        <h2>Other sites</h2>
+        <p>
+          Our Free Tools and other linked sites, such as Frantic Search, have their own policies
+          that apply when you use them.
+        </p>
+
+        <h2>Children</h2>
+        <p>This site isn't directed to children under 13, and we don't knowingly collect their information.</p>
+
+        <h2>Changes</h2>
+        <p>If we change this policy, we'll update the date above.</p>
+
+        <h2>Contact</h2>
+        <p>
+          {BUSINESS.name}
+          {BUSINESS.address && <><br />{BUSINESS.address}</>}
+          {BUSINESS.email && <><br /><a href={`mailto:${BUSINESS.email}`}>{BUSINESS.email}</a></>}
+          <br />
+          Or use the <a href="#contact">contact form</a>.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+function usePage() {
+  const read = () => (window.location.hash === '#privacy' ? 'privacy' : 'home')
+  const [page, setPage] = useState(read)
+  useEffect(() => {
+    const onChange = () => setPage(read())
+    window.addEventListener('hashchange', onChange)
+    return () => window.removeEventListener('hashchange', onChange)
+  }, [])
+  useEffect(() => {
+    document.title = page === 'privacy' ? 'Privacy Policy | Hypertonic Studios' : 'Hypertonic Studios'
+    if (page === 'privacy') {
+      window.scrollTo(0, 0)
+    } else if (window.location.hash.length > 1) {
+      requestAnimationFrame(() =>
+        document.getElementById(window.location.hash.slice(1))?.scrollIntoView(),
+      )
+    }
+  }, [page])
+  return page
+}
+
 export default function App() {
+  const page = usePage()
   return (
     <>
       <Header />
       <main>
-        <Home />
-        <Software />
-        <Games />
-        <Tools />
-        <Contact />
+        {page === 'privacy' ? (
+          <Privacy />
+        ) : (
+          <>
+            <Home />
+            <Software />
+            <Games />
+            <Tools />
+            <Contact />
+          </>
+        )}
       </main>
-      <footer className="footer">
-        <div className="container">© {new Date().getFullYear()} Hypertonic Studios</div>
-      </footer>
+      <Footer />
     </>
   )
 }
